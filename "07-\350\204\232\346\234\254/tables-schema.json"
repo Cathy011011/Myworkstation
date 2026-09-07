@@ -1,0 +1,104 @@
+{
+  "_comment": "六张表的建表 schema。逐张喂给 database/create_database.py --schema '<JSON>'（每次一张表的对象，需拆分为单独 title+properties）。注意：date 的 config 形态以首表实测为准，若报错改为 {\"date\":{\"format\":\"yyyy-mm-dd\"}}。",
+  "_order": ["日程表", "待办表", "翻译表", "问答表", "日程规划表", "信息整理表"],
+  "tables": [
+    {
+      "title": "日程表",
+      "properties": [
+        { "name": "标题", "config": { "text": "" } },
+        { "name": "日期键", "config": { "text": "" } },
+        { "name": "日期", "config": { "date": "2026-09-07T00:00:00Z" } },
+        { "name": "开始时间", "config": { "text": "" } },
+        { "name": "结束时间", "config": { "text": "" } },
+        { "name": "类型", "config": { "select": { "options": [{"text":"工作"},{"text":"学习"},{"text":"生活"},{"text":"健康"},{"text":"社交"},{"text":"家庭"},{"text":"其他"}] } } },
+        { "name": "地点", "config": { "text": "" } },
+        { "name": "状态", "config": { "select": { "options": [{"text":"待开始"},{"text":"进行中"},{"text":"已完成"},{"text":"已取消"}] } } },
+        { "name": "提醒", "config": { "checkbox": false } },
+        { "name": "备注", "config": { "text": "" } },
+        { "name": "创建时间", "config": { "date": "2026-09-07T00:00:00Z" } }
+      ]
+    },
+    {
+      "title": "待办表",
+      "properties": [
+        { "name": "标题", "config": { "text": "" } },
+        { "name": "优先级", "config": { "select": { "options": [{"text":"重要紧急"},{"text":"重要"},{"text":"一般"},{"text":"低"}] } } },
+        { "name": "状态", "config": { "select": { "options": [{"text":"待办"},{"text":"进行中"},{"text":"已完成"},{"text":"已搁置"}] } } },
+        { "name": "完成", "config": { "checkbox": false } },
+        { "name": "截止日期键", "config": { "text": "" } },
+        { "name": "截止日期", "config": { "date": "2026-09-07T00:00:00Z" } },
+        { "name": "领域", "config": { "multi_select": { "options": [{"text":"工作"},{"text":"学习"},{"text":"生活"},{"text":"健康"},{"text":"财务"},{"text":"家庭"}] } } },
+        { "name": "计划周", "config": { "text": "" } },
+        { "name": "完成时间", "config": { "date": "2026-09-07T00:00:00Z" } },
+        { "name": "备注", "config": { "text": "" } }
+      ]
+    },
+    {
+      "title": "翻译表",
+      "properties": [
+        { "name": "原文", "config": { "text": "" } },
+        { "name": "译文", "config": { "text": "" } },
+        { "name": "源语言", "config": { "select": { "options": [{"text":"中文"},{"text":"英文"},{"text":"日文"},{"text":"韩文"},{"text":"法文"},{"text":"德文"},{"text":"其他"}] } } },
+        { "name": "目标语言", "config": { "select": { "options": [{"text":"中文"},{"text":"英文"},{"text":"日文"},{"text":"韩文"},{"text":"法文"},{"text":"德文"},{"text":"其他"}] } } },
+        { "name": "模型", "config": { "select": { "options": [{"text":"DeepSeek"},{"text":"通义千问"},{"text":"Kimi"},{"text":"智谱"},{"text":"OpenAI"},{"text":"自定义"}] } } },
+        { "name": "状态", "config": { "select": { "options": [{"text":"草稿"},{"text":"待处理"},{"text":"处理中"},{"text":"已完成"},{"text":"失败"}] } } },
+        { "name": "处理方式", "config": { "select": { "options": [{"text":"页面直连"},{"text":"代理回写"},{"text":"手动"}] } } },
+        { "name": "错误信息", "config": { "text": "" } },
+        { "name": "处理时间", "config": { "date": "2026-09-07T00:00:00Z" } },
+        { "name": "收藏", "config": { "checkbox": false } },
+        { "name": "标签", "config": { "multi_select": { "options": [{"text":"工作"},{"text":"教学"},{"text":"设计"},{"text":"生活"},{"text":"沟通"}] } } },
+        { "name": "自定义标签", "config": { "text": "" } },
+        { "name": "创建时间", "config": { "date": "2026-09-07T00:00:00Z" } }
+      ]
+    },
+    {
+      "title": "问答表",
+      "properties": [
+        { "name": "问题", "config": { "text": "" } },
+        { "name": "回答", "config": { "text": "" } },
+        { "name": "模型", "config": { "select": { "options": [{"text":"DeepSeek"},{"text":"通义千问"},{"text":"Kimi"},{"text":"智谱"},{"text":"OpenAI"},{"text":"自定义"}] } } },
+        { "name": "状态", "config": { "select": { "options": [{"text":"待处理"},{"text":"处理中"},{"text":"已完成"},{"text":"失败"}] } } },
+        { "name": "处理方式", "config": { "select": { "options": [{"text":"页面直连"},{"text":"代理回写"},{"text":"手动"}] } } },
+        { "name": "错误信息", "config": { "text": "" } },
+        { "name": "处理时间", "config": { "date": "2026-09-07T00:00:00Z" } },
+        { "name": "已归档", "config": { "checkbox": false } },
+        { "name": "标签", "config": { "multi_select": { "options": [{"text":"沟通"},{"text":"教学"},{"text":"设计"},{"text":"方法论"},{"text":"AI"},{"text":"职场"}] } } },
+        { "name": "自定义标签", "config": { "text": "" } },
+        { "name": "评分", "config": { "number": 0 } },
+        { "name": "创建时间", "config": { "date": "2026-09-07T00:00:00Z" } }
+      ]
+    },
+    {
+      "title": "日程规划表",
+      "properties": [
+        { "name": "规划标题", "config": { "text": "" } },
+        { "name": "周期类型", "config": { "select": { "options": [{"text":"本周"},{"text":"下周"},{"text":"本月"},{"text":"本季度"},{"text":"年度"}] } } },
+        { "name": "周期键", "config": { "text": "" } },
+        { "name": "开始日期键", "config": { "text": "" } },
+        { "name": "结束日期键", "config": { "text": "" } },
+        { "name": "开始日期", "config": { "date": "2026-09-07T00:00:00Z" } },
+        { "name": "结束日期", "config": { "date": "2026-09-07T00:00:00Z" } },
+        { "name": "进度", "config": { "number": 0 } },
+        { "name": "状态", "config": { "select": { "options": [{"text":"未开始"},{"text":"进行中"},{"text":"已完成"},{"text":"已延期"}] } } },
+        { "name": "关键结果", "config": { "text": "" } },
+        { "name": "领域", "config": { "multi_select": { "options": [{"text":"工作"},{"text":"学习"},{"text":"生活"},{"text":"健康"},{"text":"家庭"}] } } },
+        { "name": "备注", "config": { "text": "" } }
+      ]
+    },
+    {
+      "title": "信息整理表",
+      "properties": [
+        { "name": "标题", "config": { "text": "" } },
+        { "name": "来源", "config": { "url": { "text": "", "link": "" } } },
+        { "name": "来源名称", "config": { "text": "" } },
+        { "name": "原文摘录", "config": { "text": "" } },
+        { "name": "我的笔记", "config": { "text": "" } },
+        { "name": "标签", "config": { "multi_select": { "options": [{"text":"方法论"},{"text":"AI"},{"text":"读书"},{"text":"健康"},{"text":"理财"},{"text":"职场"},{"text":"设计"},{"text":"其他"}] } } },
+        { "name": "自定义标签", "config": { "text": "" } },
+        { "name": "已归档", "config": { "checkbox": false } },
+        { "name": "评分", "config": { "number": 0 } },
+        { "name": "创建时间", "config": { "date": "2026-09-07T00:00:00Z" } }
+      ]
+    }
+  ]
+}
