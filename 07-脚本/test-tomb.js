@@ -65,6 +65,22 @@ const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
   R.a3_ls = await lsState();
   log('A3 刷新后不复活:', R.a3_noRevival, '(核心断言) | 存储日程:', JSON.stringify(R.a3_ls.schedTitles), '| 墓碑:', JSON.stringify(R.a3_ls.tombs && R.a3_ls.tombs.schedule));
 
+  // ============ 场景二b：删除假成功（updateRecord resolve 但云端永远返回活记录） ============
+  log('--- fakedel 场景：假成功 → 墓碑保留 → 刷新不复活 ---');
+  await nav(`http://127.0.0.1:${PORT}/test-tomb-fakedel.html`, 4000);
+  // 此页与场景一共享 localStorage（同源）：ghost1 墓碑仍在 → 裁决时云端仍是活记录 → 墓碑必须保留
+  R.af_ls = await lsState();
+  R.af_ghostVisible = await bodyHas('幽灵测试任务');
+  log('B1 假成功场景 墓碑:', JSON.stringify(R.af_ls.tombs && R.af_ls.tombs.schedule), '(期望仍含 ghost1) | 幽灵可见:', R.af_ghostVisible, '(期望 false)');
+  // 再删一次（若可见）并刷新，验证假成功路径下也不复活
+  await ev(`(function(){var b=${W}.document.querySelector('[data-act="del"][data-id="ghost1"]');if(b)b.click();})()`);
+  await sleep(2500);
+  await ev('location.reload(); true');
+  await sleep(3500);
+  await gotoSchedule();
+  R.af2_noRevival = !(await bodyHas('幽灵测试任务'));
+  log('B2 假成功+删除+刷新后 不复活:', R.af2_noRevival, '(期望 true)');
+
   // ============ 场景二：云端已软删 → 墓碑自动解除 ============
   log('--- softdel 场景：云端确认 → 墓碑解除 ---');
   await nav(`http://127.0.0.1:${PORT}/test-tomb-softdel.html`, 3500);
@@ -87,8 +103,10 @@ const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
   fs.writeFileSync('04-测试/screenshots/tomb-test-final.png', Buffer.from(shot.result.data, 'base64'));
 
   const tombsA4 = Object.keys((R.a4_ls.tombs && R.a4_ls.tombs.schedule) || {}).length;
+  const tombsFake = (R.af_ls.tombs && R.af_ls.tombs.schedule) || {};
   const pass = R.a1_ghostVisible === true && R.a2_click === 'CLICKED' && R.a2_gone === true &&
     R.a3_noRevival === true && tombsA4 === 0 && R.a4_ghostVisible === false &&
+    tombsFake.ghost1 === 1 && R.af_ghostVisible === false && R.af2_noRevival === true &&
     R.llm && R.llm.ok === true;
   log(pass ? '=== RESULT: ALL PASS ===' : '=== RESULT: FAIL === ' + JSON.stringify(R).slice(0, 500));
   process.exit(pass ? 0 : 1);

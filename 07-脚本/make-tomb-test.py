@@ -5,9 +5,12 @@ import re, sys
 SRC = r"D:/算法话画工作室/海之花严格致远教育科技有限公司/第三节课 WB工作台 V2/02-原型/demo.html"
 DST = r"D:/算法话画工作室/海之花严格致远教育科技有限公司/第三节课 WB工作台 V2/07-脚本/test-tomb.html"
 
-MODE = sys.argv[1] if len(sys.argv) > 1 else "live"   # live=云端有活记录 | softdel=云端已软删
-DST = r"D:/算法话画工作室/海之花严格致远教育科技有限公司/第三节课 WB工作台 V2/07-脚本/" + (
-    "test-tomb.html" if MODE == "live" else "test-tomb-softdel.html")
+MODE = sys.argv[1] if len(sys.argv) > 1 else "live"   # live=活记录 | softdel=已软删 | fakedel=删除假成功(永远返回活记录)
+DST = r"D:/算法话画工作室/海之花严格致远教育科技有限公司/第三节课 WB工作台 V2/07-脚本/" + {
+    "live": "test-tomb.html",
+    "softdel": "test-tomb-softdel.html",
+    "fakedel": "test-tomb-fakedel.html",
+}.get(MODE, "test-tomb.html")
 
 GHOST_REC = '{"id":"ghost1","properties":{"标题":{"text":"幽灵测试任务"},"日期键":{"text":"2026-09-07"}}}'
 if MODE == "softdel":
@@ -23,12 +26,15 @@ window.__SMART_PAGE__={database:{
     return Promise.resolve({records:[]});
   },
   addRecord:function(){ return Promise.reject(new Error('HTTP 401 not login')); },
-  updateRecord:function(){ return Promise.reject(new Error('HTTP 401 not login')); },
+  updateRecord:function(){ return %UPD%; },
   deleteRecord:function(){ return Promise.reject(new Error('HTTP 401 not login')); }
 }};
 </script>"""
 
 MOCK = MOCK.replace("%GHOST%", GHOST_REC)
+# fakedel：updateRecord 假成功（resolve 但 query 永远返回活记录）——复现平台假成功 bug
+MOCK = MOCK.replace("%UPD%", "Promise.reject(new Error('HTTP 401 not login'))" if MODE != "fakedel"
+                    else "Promise.resolve({ok:true})")
 
 html = open(SRC, encoding="utf-8").read()
 idx = html.rindex("<script>")
