@@ -3,13 +3,8 @@
 *.env
 .env*
 
-# Test/runtime artifacts
+# Runtime artifacts
 node_modules/
-07-脚本/page-versions/up.json
-07-脚本/*-result.json
-07-脚本/diag-*.js
-07-脚本/diag-*.png
-04-测试/screenshots/
 
 # OS/editor files
 .DS_Store

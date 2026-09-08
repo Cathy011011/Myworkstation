@@ -4,7 +4,7 @@
 <head data-page-node-id="0KWiIAykmDMDpMeaABX2Rn">
 <meta charset="UTF-8" data-page-node-id="zbGdgYYr7DS4ENVCG6X5UH">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" data-page-node-id="8cJ96bkdsDRuSsj232ADQJ">
-<title>生活工作台 · 六模块</title>
+<title>个人日程管理小助手 · v1.0</title>
 <style>
 :root{
   --paper:#f5f0e8; --card:#fffdfa; --ink:#29251f; --muted:#746d63; --line:#ded5c8;
@@ -244,8 +244,8 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(98,122,103,.12
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" data-page-node-id="eIpxWuTvpW7lB6rzbeljpA"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" data-page-node-id="fDYozOfuvHB1MmG6cMygY1"/><path d="M8 12h8M8 16h5" data-page-node-id="ORqqb3Hfqold3AjcGFzWVJ"/></svg>
       </div>
       <div data-page-node-id="C3auRXppcUx1YOVJtpGbSO">
-        <div class="brand-name" data-page-node-id="58IHFSc2IKnU6ng4u4hLp3">日常集</div>
-        <div class="brand-tag" data-page-node-id="CpJVeNhjkm1318HmkrishF">生活有迹可循</div>
+        <div class="brand-name" data-page-node-id="58IHFSc2IKnU6ng4u4hLp3">个人日程管理小助手</div>
+        <div class="brand-tag" data-page-node-id="CpJVeNhjkm1318HmkrishF">日程有迹可循 · v1.0</div>
       </div>
     </div>
     <div class="nav-group-label" data-page-node-id="TUqjHvomgzFaCm0Lz7r5w5">生活模块</div>
@@ -263,6 +263,7 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(98,122,103,.12
         <p class="page-sub" id="tbSub" data-page-node-id="q6XyPTHwM1aBD72XvDDKsP"></p>
       </div>
       <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center" data-page-node-id="dCeOhSE71PBNiV4wB5eZEl">
+        <span id="verTag" style="font-size:11px;opacity:.55;margin-right:8px" title="页面代码版本：右上角徽章旁可见。若与此版本号不符，说明浏览器缓存了旧页面，请强制刷新（Ctrl+F5 / 清除缓存）">v16</span>
         <span id="syncBadge" class="sync-badge off" title="数据同步状态"><span class="dot">○</span>连接中…</span>
         <button class="btn btn-ghost btn-sm" data-act="open-settings" data-page-node-id="d60ne7rEHmCkUhMftgUoXa">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" data-page-node-id="E0MuAAHmhdQ4rfXGQqw4BZ"><circle cx="12" cy="12" r="3" data-page-node-id="zgpxFDfzatMxeEJBZaA9Ew"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H1a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 2.6 7a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H7a1.7 1.7 0 0 0 1-1.5V1a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V7a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" data-page-node-id="Jpg0h9CitGqgMM8ZcxrO9I"/></svg>
@@ -405,16 +406,18 @@ function seed(){
 var STORE_KEY='lwb_workbench_v2';
 var snapshot={};   /* 与云端对齐的快照（持久化，防止刷新后丢失"未推送"标记） */
 var tombs={};      /* 墓碑：本地已删但云端未确认 {mod:{id:1}}。拉取时过滤，云端确认后解除，杜绝删除后复活 */
+var firstRun=false;   /* 全新浏览器首开标记（拉取到云端数据后自动清除） */
 var data=load();
 function load(){
   try{
     var raw=localStorage.getItem(STORE_KEY);
     if(raw){
       var d=JSON.parse(raw);
-      if(d&&d.data&&d.data.schedule){ snapshot=d.snapshot||{}; tombs=d.tombs||{}; return d.data; }  /* 新格式 */
+      if(d&&d.data&&d.data.schedule){ snapshot=d.snapshot||{}; tombs=d.tombs||{}; normalizeTombs(); return d.data; }  /* 新格式 */
       if(d&&d.schedule) return d;                                                /* 旧格式迁移 */
     }
   }catch(e){}
+  firstRun=true;
   return seed();
 }
 /* 修复历史 bug 遗留的 null/空 id 条目：重建本地身份，使其能被推送与删除 */
@@ -425,6 +428,18 @@ function fixBrokenIds(d){
   });
 }
 function persistLocal(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify({data:data,snapshot:snapshot,tombs:tombs})); }catch(e){} }
+/* 旧格式墓碑（值为 1）升级为对象：{fp 内容指纹, cloudId 云端真身id, seen 是否见过, ts 时间} */
+function normalizeTombs(){
+  Object.keys(tombs).forEach(function(mod){
+    var t=tombs[mod]; if(!t||typeof t!=='object'){ tombs[mod]={}; return; }
+    Object.keys(t).forEach(function(id){
+      if(typeof t[id]!=='object'||t[id]===null) t[id]={fp:null,cloudId:null,seen:false,ts:Date.now()};
+      if(t[id].cloudId===undefined) t[id].cloudId=null;
+      if(t[id].seen===undefined) t[id].seen=false;
+      if(!t[id].ts) t[id].ts=Date.now();
+    });
+  });
+}
 function uid(){ return 'x'+Math.random().toString(36).slice(2,9); }
 
 /* ============ 云端数据层（资料库数据表 · 在线存储双向同步） ============ */
@@ -523,9 +538,11 @@ function cloudText(v){ if(v==null) return ''; if(typeof v==='string') return v;
     if(v.length!==undefined&&typeof v.length==='number'){ var o=v[0]||{}; return o.link||o.text||''; }
     return v.link||v.text||v.name||'';
   } return String(v); }
-function cloudBool(v){ return v===true||v==='true'; }
+function cloudBool(v){ if(v&&typeof v==='object') return v.checkbox===true||v.checkbox==='true'; return v===true||v==='true'; }
 function cloudArr(v){ if(Array.isArray(v)) return v; if(typeof v==='string'&&v){ return v.split(/[,，、]\s*/).filter(Boolean); } return v?[v]:[]; }
-function cloudDate(v){ if(!v) return ''; var s=String(v); return s.length>=10?s.slice(0,10):s; }
+function cloudDate(v){ if(!v) return ''; if(typeof v==='object'){ v=v.date||v.start||v.end||''; if(!v) return ''; } var s=String(v); return s.length>=10?s.slice(0,10):s; }
+/* 平台读回的布尔标记可能是 {checkbox:true} 对象形态——所有"已删除"判断统一走这里 */
+function flagTrue(v){ return cloudBool(v); }
 
 function toRecord(mod,item){
   var props={};
@@ -552,6 +569,16 @@ function fromRecord(mod,recId,props){
     }
   });
   return item;
+}
+/* 内容指纹：用于本地 id 与云端 record_id 错位时，按内容认出"同一条"（跨端删除的关键）。
+   1) 排除 created 等服务端补写字段（否则指纹永不匹配）
+   2) 标题/原文/问题全空的记录返回 null——空白记录不参与指纹匹配，防止互相误认引发级联删除 */
+function fpOf(mod,item){
+  if(!item) return null;
+  var anchor=[item.title,item.src,item.q].some(function(v){ return v!=null&&String(v).trim()!==''; });
+  if(!anchor) return null;
+  return JSON.stringify([item.title,item.src,item.q,item.date,item.start,item.end,item.due]
+    .map(function(v){ return v==null?'':String(v); }));
 }
 
 /* ---- 资料库 API 封装（页面沙盒内由平台注入） ---- */
@@ -630,6 +657,12 @@ function save(){
 
 var pushDirty=false;   /* 推送期间若有新写入，完成后补推一轮 */
 var pushDoneCb=null;   /* 推送完成后的回调（刷新云端数据：先推后拉） */
+/* 新增保护：新增推送成功后的 90 秒内，云端查询可能尚未返回该记录（平台延迟），
+   此期间的拉取不得用云端覆盖掉这些新任务（否则"刚输入的任务被删除"） */
+var addGuard={};
+function guardAdd(mod,id){ (addGuard[mod]||(addGuard[mod]={}))[id]=Date.now(); }
+function isGuarded(mod,id){ var t=addGuard[mod]&&addGuard[mod][id]; return !!t&&(Date.now()-t<90000); }
+function pruneGuard(){ var now=Date.now(); Object.keys(addGuard).forEach(function(mod){ Object.keys(addGuard[mod]).forEach(function(id){ if(now-addGuard[mod][id]>90000) delete addGuard[mod][id]; }); }); }
 function schedulePush(onDone){
   if(pushing){
     pushDirty=true;
@@ -649,6 +682,17 @@ function schedulePush(onDone){
     });
     Object.keys(snap[mod]).forEach(function(id){
       if(!(id in cur)) ops.push({op:'del',mod:mod,id:id});
+    });
+  });
+  /* 墓碑重试：未确认删除的 id，补发软删除（优先用认出的云端真身 id）直到裁决确认 */
+  Object.keys(tombs).forEach(function(mod){
+    if(!DB_IDS[mod]) return;
+    var t=tombs[mod]||{}, sn=snapshot[mod]||{}, pend={};
+    ops.forEach(function(o){ if(o.op==='del') pend[o.mod+':'+o.id]=1; });
+    Object.keys(t).forEach(function(id){
+      var e=(typeof t[id]==='object'&&t[id])?t[id]:{};
+      var target=e.cloudId||id;
+      if(!(target in sn)&&!pend[mod+':'+target]){ ops.push({op:'del',mod:mod,id:target}); pend[mod+':'+target]=1; }
     });
   });
 
@@ -683,10 +727,12 @@ function schedulePush(onDone){
           var nid=(typeof rr==='string')?rr:(rr&&(rr.id!==undefined&&rr.id!==null?rr.id:(rr.record_id!==undefined&&rr.record_id!==null?rr.record_id:null)))||null;
           if(nid&&nid!==o.id){
             renameId(o.mod,o.id,nid);
+            guardAdd(o.mod,nid);   /* 新增保护：防止延迟拉取覆盖掉刚创建的记录 */
             var it2=null;
             (data[o.mod]||[]).forEach(function(x){ if(x.id===nid) it2=x; });
             snapshot[o.mod][nid]=it2?JSON.stringify(toRecord(o.mod,it2)):o.json;
           }else{
+            guardAdd(o.mod,o.id);   /* 新增保护：同上 */
             snapshot[o.mod][o.id]=o.json;   /* 保留本地 id 标记已同步；真实云端 id 延迟 pull 对齐 */
             scheduleIdAlign();
           }
@@ -694,7 +740,7 @@ function schedulePush(onDone){
           snapshot[o.mod][o.id]=o.json;
         }else{
           delete snapshot[o.mod][o.id];
-          if(tombs[o.mod]) delete tombs[o.mod][o.id];   /* 云端确认已标记删除 → 解除墓碑 */
+          /* 墓碑保留：等拉取裁决确认云端真已删后再解除（防 updateRecord 假成功→复活） */
           scheduleIdAlign();   /* 软删除后拉取验证，确保云端标记生效 */
         }
       }else{
@@ -747,19 +793,37 @@ function pullAll(){
     Promise.all(mods.map(function(mod){
       return cloudQueryAll(DB_IDS[mod]).then(function(records){
         var t=tombs[mod]||(tombs[mod]={});
-        /* 墓碑裁决：云端确认「已删除」或记录已不存在 → 解除墓碑（幂等删除达成） */
-        Object.keys(t).forEach(function(tid){
-          var rec=null;
-          records.forEach(function(r){ if(r.id===tid) rec=r; });
-          if(!rec||(rec.properties&&rec.properties['已删除']===true)){
-            delete t[tid];
-            if(snapshot[mod]) delete snapshot[mod][tid];
+        /* 墓碑裁决（v13）：
+           1) 按本地 id 或已记录的云端真身 id 找到记录：已删除=true → 解除墓碑；仍活跃 → 记住真身并继续隐藏、补推删除
+           2) 按 id 找不到 → 用内容指纹认出错位真身（本地假 id 场景），同样隐藏并补删
+           3) 都找不到 → 绝不解除墓碑（旧版"查不到就解除"会让记录复活），仅 7 天未确认才清理 */
+        var t=tombs[mod]||(tombs[mod]={});
+        normalizeTombs();
+        var now=Date.now(), FP_WINDOW=2*3600*1000, EXPIRE=4*3600*1000;
+        var byId={}; records.forEach(function(r){ byId[r.id]=r; });
+        var hidden={};
+        Object.keys(t).forEach(function(id){
+          var e=t[id];
+          var rec=byId[id]||byId[e.cloudId]||null;
+          if(rec){
+            if(rec.properties&&rec.flagTrue(properties['已删除'])){ delete t[id]; return; }
+            e.cloudId=rec.id; e.seen=true; hidden[rec.id]=1; hidden[id]=1; return;
           }
+          var hit=null;
+          if(e.fp&&(now-(e.ts||0))<FP_WINDOW){
+            records.forEach(function(r){
+              if(hit||(r.properties&&r.flagTrue(properties['已删除']))) return;
+              if(fpOf(mod,fromRecord(mod,r.id,r.properties))===e.fp) hit=r;
+            });
+          }
+          if(hit){ e.cloudId=hit.id; e.seen=true; hidden[hit.id]=1; hidden[id]=1; return; }
+          if(now-(e.ts||0)>EXPIRE){ delete t[id]; return; }
+          hidden[id]=1;   /* 未确认：继续隐藏，等下次同步补删 */
         });
-        /* 过滤：云端已软删的不进本地；本地墓碑未决的（删除还没推成功）也绝不复活 */
+        /* 过滤：云端已软删的不进本地；墓碑未决的（含错位真身）绝不复活 */
         return {raw:records,
                 list:records.filter(function(r){
-                  return !(r.properties&&r.properties['已删除']===true)&&!(tombs[mod]&&tombs[mod][r.id]);
+                  return !(r.properties&&r.flagTrue(properties['已删除']))&&!hidden[r.id];
                 }).map(function(r){ return fromRecord(mod,r.id,r.properties); })};
       });
     })),
@@ -774,6 +838,7 @@ function pullAll(){
     var emptyAndKept=[], seeded=[], dirtyKept=[];
     mods.forEach(function(mod,i){
       var cloud=arr[i], local=data[mod]||[];
+      if(firstRun&&rawArr[i].length>0){ data[mod]=cloud; return; }   /* 全新浏览器首开：云端有真实数据 → 示例数据让位 */
       if(local.length===0){
         /* 本机该模块无数据：云端有原始记录就取云端（即使全被墓碑过滤也不灌示例），两边都空则首开灌示例 */
         if(rawArr[i].length>0){ data[mod]=cloud; }
@@ -788,10 +853,21 @@ function pullAll(){
         /* 云端有 + 本地有未推送的修改：保留本地（等推送成功后再刷新），防止拉取覆盖本机新内容 */
         dirtyKept.push(mod);
       }else{
-        data[mod]=cloud;         /* 本地与云端对齐（本地无未推变更）→ 安全覆盖 */
+        /* 本地与云端对齐（本地无未推变更）；90 秒内新增的任务即使云端还没返回也保留（防"刚输入就被删"）。
+           若云端已按内容追上（id 可能不同），本地副本按内容指纹去重，防止同一条显示两份 */
+        var kept=[], cloudFps={};
+        cloud.forEach(function(c){ var g=fpOf(mod,c); if(g) cloudFps[g]=1; });
+        (local||[]).forEach(function(it){
+          var g=fpOf(mod,it);
+          if(isGuarded(mod,it.id)&&!(g&&cloudFps[g])) kept.push(it);
+        });
+        data[mod]=kept.length?cloud.concat(kept):cloud;
       }
     });
     pullDone=true;
+    firstRun=false;
+    /* 数据没变化时跳过整页重绘，最大限度避免打断用户输入（v14 的输入保护兜底仍生效） */
+    var beforeData=JSON.stringify(data);
     snapshot=buildSnapshot();
     emptyAndKept.forEach(function(m){ snapshot[m]={}; });
     seeded.forEach(function(m){ snapshot[m]={}; });
@@ -799,7 +875,7 @@ function pullAll(){
     persistLocal();
     pullAttempt=0;
     setSync('online');
-    render();
+    if(JSON.stringify(data)!==beforeData) render();
     if(emptyAndKept.length||seeded.length||dirtyKept.length){
       var hint=[];
       if(emptyAndKept.length) hint.push('云端为空的模块已保留本机数据（'+emptyAndKept.map(function(m){return VIEW_NAME[m]||m;}).join('、')+'），正在推回云端');
@@ -808,7 +884,7 @@ function pullAll(){
       syncState.msg=hint.join('；');
     }
     renderSyncBadge();
-    if(emptyAndKept.length||seeded.length) schedulePush();
+    if(emptyAndKept.length||seeded.length||dirtyKept.length) schedulePush();   /* dirtyKept 也自动补推：本机修改（含墓碑）不再永远等手动 */
     return true;
   }).catch(function(e){
     if(pullAttempt<4){
@@ -1231,6 +1307,27 @@ function renderInfo(){
 }
 
 /* ============ 路由 ============ */
+/* 渲染前后保留表单输入：后台同步完成触发 render() 时，正在填写的内容不再丢失 */
+function captureFormValues(){
+  var vals={};
+  try{
+    document.querySelectorAll('#viewRoot input,#viewRoot select,#viewRoot textarea').forEach(function(el){
+      if(!el.id||el.type==='password') return;
+      vals[el.id]=(el.type==='checkbox')?el.checked:el.value;
+    });
+  }catch(e){}
+  return vals;
+}
+function restoreFormValues(vals){
+  if(!vals) return;
+  try{
+    Object.keys(vals).forEach(function(id){
+      var el=document.getElementById(id);
+      if(!el) return;
+      if(el.type==='checkbox') el.checked=!!vals[id]; else el.value=vals[id];
+    });
+  }catch(e){}
+}
 function render(){
   renderNav();
   var v=VIEWS.filter(function(x){return x.id===state.view;})[0]||VIEWS[0];
@@ -1238,6 +1335,7 @@ function render(){
   document.getElementById('tbTitle').textContent=v.name;
   document.getElementById('tbSub').textContent=v.sub;
   var root=document.getElementById('viewRoot');
+  var keep=captureFormValues();
   var demo='<div class="demo-banner">'
     +'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>'
     +'<span>数据已接入<b>资料库在线数据表</b>：新增、修改、删除即时写回云端，换设备、换浏览器打开都是同一份数据。</span></div>';
@@ -1251,7 +1349,8 @@ function render(){
   else if(state.view==='plan') body=renderPlan();
   else body=renderInfo();
   root.innerHTML=demo+body;
-  window.scrollTo(0,0);
+  restoreFormValues(keep);
+  if(state.view==='overview'){ window.scrollTo(0,0); }
 }
 
 /* ============ AI 调用（OpenAI 兼容协议，支持中转站） ============ */
@@ -1308,8 +1407,14 @@ document.addEventListener('click',function(e){
   if(act==='go'){ state.view=el.getAttribute('data-view'); render(); return; }
   if(act==='del'){
     var kind=el.getAttribute('data-kind');
+    var victim=null;
+    (data[kind]||[]).forEach(function(r){ if(r.id===id) victim=r; });
+    var vTitle=(victim&&(victim.title||victim.src||victim.q))||'这条记录';
+    if(!confirm('确定删除「'+vTitle+'」吗？删除后会在所有设备同步消失。')) return;
     data[kind]=data[kind].filter(function(r){return r.id!==id;});
-    if(DB_IDS[kind]&&id){ (tombs[kind]||(tombs[kind]={}))[id]=1; }  /* 墓碑：删除立即生效且刷新不复活，云端确认后自动解除 */
+    if(DB_IDS[kind]&&id){
+      (tombs[kind]||(tombs[kind]={}))[id]={fp:fpOf(kind,victim),cloudId:null,seen:false,ts:Date.now()};
+    }
     save(); render(); return;
   }
   if(act==='toggle-todo'){
