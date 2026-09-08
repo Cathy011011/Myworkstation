@@ -95,6 +95,7 @@ function serverQuery(dbId) {
   // ---- 5. 点「刷新云端数据」→ 记录必须保持隐藏 ----
   await ev(`(function(){var w=${W};var b=w.document.querySelector('[data-act="refresh-cloud"]');if(b)b.click();})()`);
   await sleep(6000);
+  for(var k=0;k<3;k++){ await ev(`(function(){var w=${W};var b=w.document.querySelector('[data-act="refresh-cloud"]');if(b)b.click();})()`); await sleep(4000); }
   const afterRefresh = await bodyHas(TAG);
   log('S6 刷新云端数据后 可见:', afterRefresh, '(期望 false ★ 用户报告的复活点)');
 
