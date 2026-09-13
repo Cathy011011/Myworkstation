@@ -263,7 +263,7 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(98,122,103,.12
         <p class="page-sub" id="tbSub" data-page-node-id="q6XyPTHwM1aBD72XvDDKsP"></p>
       </div>
       <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center" data-page-node-id="dCeOhSE71PBNiV4wB5eZEl">
-        <span id="verTag" style="font-size:11px;opacity:.55;margin-right:8px" title="页面代码版本：右上角徽章旁可见。若与此版本号不符，说明浏览器缓存了旧页面，请强制刷新（Ctrl+F5 / 清除缓存）">v16</span>
+        <span id="verTag" style="font-size:11px;opacity:.55;margin-right:8px" title="页面代码版本：右上角徽章旁可见。若与此版本号不符，说明浏览器缓存了旧页面，请强制刷新（Ctrl+F5 / 清除缓存）">v1.0</span>
         <span id="syncBadge" class="sync-badge off" title="数据同步状态"><span class="dot">○</span>连接中…</span>
         <button class="btn btn-ghost btn-sm" data-act="open-settings" data-page-node-id="d60ne7rEHmCkUhMftgUoXa">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" data-page-node-id="E0MuAAHmhdQ4rfXGQqw4BZ"><circle cx="12" cy="12" r="3" data-page-node-id="zgpxFDfzatMxeEJBZaA9Ew"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H1a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 2.6 7a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H7a1.7 1.7 0 0 0 1-1.5V1a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V7a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" data-page-node-id="Jpg0h9CitGqgMM8ZcxrO9I"/></svg>
@@ -942,11 +942,11 @@ var state={ view:'overview', todoFilter:'全部', planFilter:'全部', infoFilte
 /* ============ 侧栏 / 移动导航 ============ */
 function renderNav(){
   document.getElementById('sideNav').innerHTML=VIEWS.map(function(v){
-    return '<button class="nav-i'+(state.view===v.id?' active':'')+'" data-act="go" data-view="'+v.id+'">'
+    return `<button class="nav-i${(state.view===v.id?' active':'')}" data-act="go" data-view="${v.id}">`
       +icon(v.icon,18)+'<span>'+v.name+'</span></button>';
   }).join('');
   document.getElementById('mobileNav').innerHTML=VIEWS.map(function(v){
-    return '<button class="mn-i'+(state.view===v.id?' active':'')+'" data-act="go" data-view="'+v.id+'">'
+    return `<button class="mn-i${(state.view===v.id?' active':'')}" data-act="go" data-view="${v.id}">`
       +icon(v.icon,19)+'<span>'+v.name+'</span></button>';
   }).join('');
 }
